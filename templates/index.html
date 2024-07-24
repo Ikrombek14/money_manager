@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Overview{% endblock %}
+
+{% block content %}
+    <div class="title-group mb-3">
+        <h1 class="h2 mb-0">Overview</h1>
+        <small class="text-muted">Hello {{ user.username }}, welcome back!</small>
+    </div>
+
+    <div class="row my-4">
+        <div class="col-lg-7 col-12">
+            <div class="custom-block custom-block-balance">
+                <small>Your Balance</small>
+                <h2 class="mt-2 mb-3">{{ net_profit }}</h2>
+                <div class="ms-auto">
+                    <small>Username</small>
+                    <p>{{ user.username }}</p>
+                </div>
+            </div>
+
+            <div class="custom-block bg-white">
+                <h5 class="mb-4">Total</h5>
+                <p>Total Income: {{ total_income }}  |  <a href="{% url 'moneymanager:add_income' %}" class="btn btn-green">Add Income</a></p>
+                <p>Total Expense: {{ total_expense }} |  <a href="{% url 'moneymanager:add_expense' %}" class="btn btn-red">To Spend</a></p>
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-12">
+            <div class="custom-block custom-block-transations">
+                <h5 class="mb-4">Recent Transactions</h5>
+                {% for expense in recent_expenses %}
+                <div class="d-flex flex-wrap align-items-center mb-4">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p>{{ expense.category }}</p>
+                            <small class="text-muted">Expense</small>
+                        </div>
+                    </div>
+                    <div class="ms-auto">
+                        <small>{{ expense.date|date:"d/m/Y" }}</small>
+                        <strong class="d-block text-danger"><span class="me-1">-</span> {{ expense.amount }}</strong>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No recent expenses.</p>
+                {% endfor %}
+                {% for income in recent_incomes %}
+                <div class="d-flex flex-wrap align-items-center mb-4">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <p>{{ income.category }}</p>
+                            <small class="text-muted">Income</small>
+                        </div>
+                    </div>
+                    <div class="ms-auto">
+                        <small>{{ income.date|date:"d/m/Y" }}</small>
+                        <strong class="d-block text-success"><span class="me-1">+</span> {{ income.amount }}</strong>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No recent incomes.</p>
+                {% endfor %}
+            </div>
+            <div class="border-top pt-4 mt-4 text-center">
+                <a class="btn custom-btn" href="{% url 'moneymanager:all-transactions' %}">
+                    View all transactions
+                    <i class="bi-arrow-up-right-circle-fill ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .btn-green {
+        background-color: #28a745;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-green:hover {
+        background-color: #218838;
+    }
+
+    .btn-red {
+        background-color: #dc3545;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-red:hover {
+        background-color: #c82333;
+    }
+
+    .custom-block {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-block-balance {
+        background-color: #f1f1f1;
+    }
+
+    .custom-block-transations {
+        background-color: #fff;
+    }
+</style>
+{% endblock %}

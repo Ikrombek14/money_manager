@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Income{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <h3 class="card-title text-center">Add Income</h3>
+            <form method="post" action="{% url 'moneymanager:add_income' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-custom btn-block">Add Income</button>
+            </form>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-4">
+            <a class="btn btn-secondary" href="{% url 'moneymanager:home' %}">
+                <i class="bi bi-arrow-left-circle"></i> Back
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Open Sans', sans-serif;
+    }
+    .card {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: #ffffff;
+        border: none;
+    }
+    .card-title {
+        font-size: 1.5rem;
+        color: #343a40;
+        margin-bottom: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #495057;
+        border: 2px solid #dee2e6;
+        border-radius: 5px;
+        padding: 8px;
+        display: block;
+        background-color: #e9ecef;
+        font-family: 'Roboto', sans-serif;
+    }
+    .form-group input, .form-group select {
+        font-size: 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 8px;
+    }
+    .form-group input:focus, .form-group select:focus {
+        border-color: #80bdff;
+        outline: none;
+    }
+    .btn-custom {
+        background-color: #d72638;
+        color: white;
+        border-radius: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+    .btn-custom:hover {
+        background-color: #a71e2b;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border-radius: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Optional: Add any additional JavaScript needed -->
+{% endblock %}

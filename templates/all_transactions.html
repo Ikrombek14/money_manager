@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}All Transactions{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>All Transactions</h1>
+        <div class="summary mb-4">
+            <div>
+                <p>Total Income</p>
+                <p class="value" id="total_income">{{ total_income }}</p>
+            </div>
+            <div>
+                <p>Total Expense</p>
+                <p class="value" id="total_expense">{{ total_expense }}</p>
+            </div>
+            <div>
+                <p>Net Profit</p>
+                <p class="value" id="net_profit">{{ net_profit }}</p>
+            </div>
+        </div>
+
+        <div class="filters mb-4">
+            <form method="get" id="summary-form">
+                <label for="summary_type">Summary Type:</label>
+                <select id="summary_type" name="summary_type">
+                    <option value="">Choose</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" name="start_date">
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" name="end_date">
+                <button type="submit" id="filter_button" class="btn btn-primary">Filter</button>
+            </form>
+        </div>
+
+        <div class="transactions mb-4">
+            <section class="recent-incomes mb-4">
+                <h2>Recent Incomes</h2>
+                <table class="income-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent_incomes">
+                        {% for income in recent_incomes %}
+                            <tr>
+                                <td>{{ income.date }}</td>
+                                <td>{{ income.category.name }}</td>
+                                <td>{{ income.description }}</td>
+                                <td>{{ income.amount }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="recent-expenses">
+                <h2>Recent Expenses</h2>
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent_expenses">
+                        {% for expense in recent_expenses %}
+                            <tr>
+                                <td>{{ expense.date }}</td>
+                                <td>{{ expense.category.name }}</td>
+                                <td>{{ expense.description }}</td>
+                                <td>{{ expense.amount }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{% url 'moneymanager:add_income' %}?next={% url 'moneymanager:all-transactions' %}" class="btn btn-success">Add Income</a>
+            <a href="{% url 'moneymanager:add_expense' %}?next={% url 'moneymanager:all-transactions' %}" class="btn btn-danger">To Spend</a>
+        </div>
+
+        <a href="javascript:history.back()" class="back-button">Back</a>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const summaryTypeSelect = document.getElementById('summary_type');
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        const filterButton = document.getElementById('filter_button');
+
+        summaryTypeSelect.addEventListener('change', function () {
+            fetchSummaryData();
+        });
+
+        filterButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetchTableData();
+        });
+
+        function fetchSummaryData() {
+            const summaryType = summaryTypeSelect.value;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `/all_transactions?summary_type=${summaryType}`, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    document.getElementById('total_income').textContent = `${data.income_summary}`;
+                    document.getElementById('total_expense').textContent = `${data.expense_summary}`;
+                    document.getElementById('net_profit').textContent = `${data.income_summary - data.expense_summary}`;
+                }
+            };
+            xhr.send();
+        }
+
+        function fetchTableData() {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `/all_transactions?start_date=${startDate}&end_date=${endDate}`, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    updateTable('recent_incomes', data.recent_incomes);
+                    updateTable('recent_expenses', data.recent_expenses);
+                }
+            };
+            xhr.send();
+        }
+
+        function updateTable(tableId, data) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                Object.values(item).forEach(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+                tableBody.appendChild(row);
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        position: relative;
+        padding-bottom: 60px; /* Ensures container does not overlap with the button */
+    }
+
+    .back-button {
+        display: inline-block;
+        position: absolute;
+        bottom: 20px; /* Position at the bottom */
+        left: 20px; /* Align to the left */
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1em;
+        font-weight: bold;
+    }
+
+    .back-button:hover {
+        background-color: #0056b3;
+    }
+
+    .summary {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .summary div {
+        flex: 1;
+        margin: 0 10px;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #e0f7fa;
+        text-align: center;
+    }
+
+    .summary .value {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    .filters label {
+        font-weight: bold;
+    }
+
+    .filters select, .filters input[type="date"] {
+        padding: 8px;
+        margin-right: 10px;
+        border-radius: 5px;
+    }
+
+    .filters button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        font-size: 1em;
+    }
+
+    .filters button:hover {
+        background-color: #0056b3;
+    }
+
+    .transactions {
+        margin-bottom: 20px;
+    }
+
+    .recent-incomes h2, .recent-expenses h2 {
+        color: #333;
+        border-bottom: 2px solid #00796b;
+        padding-bottom: 10px;
+    }
+
+    .income-table, .expense-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .income-table thead, .expense-table thead {
+        background-color: #e0f7fa;
+    }
+
+    .income-table th, .expense-table th {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 2px solid #00796b;
+    }
+
+    .income-table td, .expense-table td {
+        padding: 10px;
+        border-bottom: 1px solid #b2dfdb;
+    }
+
+    .income-table tr:hover, .expense-table tr:hover {
+        background-color: #b2dfdb;
+    }
+
+    .income-table {
+        border: 1px solid #00796b;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .expense-table {
+        border: 1px solid #d32f2f;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+        border-radius: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border-radius: 20px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+</style>
+{% endblock %}

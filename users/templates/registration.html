@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Ro'yxatga olish sahifasi</title>
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 400px;
+        margin: 20px;
+        padding: 30px;
+        background-color: #ffffff;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    label {
+        display: block;
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    input {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #a239bf;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: #d42fda;
+    }
+
+    .form-group .error {
+        color: red;
+        font-size: 12px;
+    }
+
+    .form-group small {
+        color: grey;
+    }
+
+    .au-input--full {
+        display: flex;
+        align-items: center;
+    }
+
+    .login-link {
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .login-link a {
+        color: #a239bf;
+        text-decoration: none;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Ro'yxatga olish</h2>
+        <form action="{% url 'users:register' %}" method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    <div class="au-input au-input--full">{{ field }}</div>
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit">Ro'yxatdan o'tish</button>
+        </form>
+        <div class="login-link">
+            <p>Allaqachon hisobingiz bormi? <a href="{% url 'users:login' %}">Tizimga kirish</a></p>
+        </div>
+    </div>
+</body>
+</html>
